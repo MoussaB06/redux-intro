@@ -17,12 +17,19 @@ function AccountOperations() {
     balance,
     loan: currentLoan,
     loanPurpose: currentLoanPurpose,
+    isLoading,
   } = useSelector((store) => store.account);
 
   function handleDeposit() {
     if (!depositAmount) return;
+
+    /// on a ce dispatch qui envoie l'action dans le store si notre
+    // currency est USD sinon 'deposit' vas envoyer une fonction qui elle a
+    // un dispatch qu'elle enverra au store (accountSlice 37-53)
+    // dispatch(deposit(depositAmount, currency));
     dispatch(deposit(depositAmount));
     setDepositAmount("");
+    setCurrency("USD");
   }
 
   function handleWithdrawal() {
@@ -64,7 +71,9 @@ function AccountOperations() {
             <option value="GBP">British Pound</option>
           </select>
 
-          <button onClick={handleDeposit}>Deposit {depositAmount}</button>
+          <button onClick={handleDeposit} disabled={isLoading}>
+            {isLoading ? "isConverting..." : `Deposit ${depositAmount}`}
+          </button>
         </div>
 
         <div>
@@ -98,7 +107,11 @@ function AccountOperations() {
         {/* pourquoi currentLoan et pas loanAmount ? */}
         {currentLoan > 0 && (
           <div>
-            <span>Pay back $X</span>
+            <span>
+              Pay back
+              {` ${currentLoan}$
+              (${currentLoanPurpose}) `}
+            </span>
             <button onClick={handlePayLoan}>Pay loan</button>
           </div>
         )}
